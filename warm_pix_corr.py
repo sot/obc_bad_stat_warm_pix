@@ -187,7 +187,7 @@ def main(opt):
                                          'count_z',
                                          'count_adj_z'])
     bin_data = []
-    bins = np.arange(-19, -13, .1)
+
     
 
     #imgs = np.empty((len(dirs),1024,1024))
@@ -229,21 +229,27 @@ def main(opt):
         warm_pix[i]['count_z'] = len(np.flatnonzero( img > (100 + zodi)))
         warm_pix[i]['count_adj_z'] = len(np.flatnonzero( img > limit_z))
 
+        poss_temps = np.arange(-20, -10, .05)
         date_bins = []
-        for b in bins:
-            blimit_z = get_limit(temp, b, zodi)
-            bcount_adj_z = len(np.flatnonzero(img > blimit_z))
+        actual_temp = temp
+        # for each possible temperature, scale the pixel data (and zodib) and
+        # count the pixels over the limit
+        for ptemp in poss_temps:
+            zodiscale = zodi * 10**((ptemp - actual_temp) / 21)
+            limit = 100 + zodiscale
+            imgscale = img * 10**((ptemp - actual_temp) / 21)
+            bcount_adj_z = len(np.flatnonzero(imgscale > limit))
             date_bins.append(bcount_adj_z)
         bin_data.append(date_bins)
 
-                               
+    np.save(open('lookup_table.np', 'w'),
+            np.rec.fromrecords(bin_data, names=["%05.2f" % t for t in poss_temps]))
     bfile = open('lookup_table.pkl', 'w')
     pickle.dump(bin_data, bfile)
     bfile.close()
     pfile = open('warm_pix.pkl', 'w')
     pickle.dump(warm_pix, pfile)
     pfile.close()
-
 
 
 if __name__ == '__main__':
