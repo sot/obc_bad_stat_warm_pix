@@ -229,7 +229,7 @@ def main(opt):
         warm_pix[i]['count_z'] = len(np.flatnonzero( img > (100 + zodi)))
         warm_pix[i]['count_adj_z'] = len(np.flatnonzero( img > limit_z))
 
-        poss_temps = np.arange(-20, -10, .05)
+        poss_temps = np.arange(-21, -10, .05)
         date_bins = []
         actual_temp = temp
         # for each possible temperature, scale the pixel data (and zodib) and
